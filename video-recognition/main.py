@@ -4,6 +4,7 @@ from deepface import DeepFace
 from collections import Counter, deque
 from tqdm import tqdm
 import os
+import sys
 import mediapipe as mp
 
 mp_pose = mp.solutions.pose
@@ -115,10 +116,16 @@ def detect_activities_and_emotions(video_path, output_path):
     print("Resumo de Atividades:", Counter(activities_summary))
     print("Resumo de Emoções:", Counter(emotions_summary))
 
-# Caminho para o arquivo de vídeo na mesma pasta do script
-script_dir = os.path.dirname(os.path.abspath(__file__))
-input_video_path = os.path.join(script_dir, 'video.mp4')  # Nome do seu vídeo
-output_video_path = os.path.join(script_dir, 'output.mp4')  # Nome do vídeo de saída
+# Permitir argumentos de linha de comando para entrada e saída
+def get_video_paths():
+    if len(sys.argv) >= 3:
+        return sys.argv[1], sys.argv[2]
+    elif len(sys.argv) == 2:
+        return sys.argv[1], 'output.mp4'
+    else:
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        return os.path.join(script_dir, 'video.mp4'), os.path.join(script_dir, 'output.mp4')
 
-# Chamar a função para detectar atividades e emoções no vídeo e salvar o vídeo processado
-detect_activities_and_emotions(input_video_path, output_video_path)
+if __name__ == "__main__":
+    input_video_path, output_video_path = get_video_paths()
+    detect_activities_and_emotions(input_video_path, output_video_path)
